@@ -2,26 +2,21 @@
 import discord
 from discord.ext import commands
 import os
-import asyncio
 
-intents = discord.Intents.default()
-intents.messages = True
-intents.guilds = True
-
-bot = commands.Bot(command_prefix="!", intents=intents)
+bot = commands.Bot(command_prefix="!")
 
 # Replace these IDs with your actual Discord channel/category IDs
-ADMIN_SIGNAL_CHANNEL_ID = 1354557383208079572   # Hidden admin channel
-PUBLIC_SIGNAL_CHANNEL_ID = 1354557176164782311  # Public signals channel
-TICKET_CATEGORY_ID = 1354558070004388081        # Ticket category
+ADMIN_SIGNAL_CHANNEL_ID = 1354557383208079572
+PUBLIC_SIGNAL_CHANNEL_ID = 1354557176164782311
+TICKET_CATEGORY_ID = 1354558070004388081
 
 @bot.event
 async def on_ready():
     print(f"{bot.user.name} is online! 🚀")
 
-# Signal Forwarding (Admin → Public)
 @bot.event
 async def on_message(message):
+    # Signal Forwarding
     if message.channel.id == ADMIN_SIGNAL_CHANNEL_ID and not message.author.bot:
         public_channel = bot.get_channel(PUBLIC_SIGNAL_CHANNEL_ID)
         await public_channel.send(f"📢 **New Signal**: {message.content}")
@@ -35,7 +30,6 @@ async def on_message(message):
     
     await bot.process_commands(message)
 
-# Ticket System
 @bot.command()
 async def ticket(ctx, *, reason="No reason provided"):
     category = bot.get_channel(TICKET_CATEGORY_ID)
@@ -50,13 +44,4 @@ async def ticket(ctx, *, reason="No reason provided"):
         f"**Reason:** {reason}"
     )
 
-# Auto-restart logic
-async def main():
-    try:
-        await bot.start(os.environ['TOKEN'])
-    except KeyboardInterrupt:
-        await bot.close()
-
-# Start the bot
-if __name__ == "__main__":
-    asyncio.run(main())
+bot.run(os.environ['TOKEN'])
