@@ -1,6 +1,8 @@
+# -*- coding: utf-8 -*-
 import discord
 from discord.ext import commands
 import os
+import asyncio
 
 intents = discord.Intents.default()
 intents.messages = True
@@ -9,9 +11,9 @@ intents.guilds = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 # Replace these IDs with your actual Discord channel/category IDs
-ADMIN_SIGNAL_CHANNEL_ID = 123456789   # Hidden admin channel (right-click → Copy ID)
-PUBLIC_SIGNAL_CHANNEL_ID = 987654321  # Public signals channel
-TICKET_CATEGORY_ID = 112233445566     # Category for ticket channels
+ADMIN_SIGNAL_CHANNEL_ID = 1354557383208079572   # Hidden admin channel
+PUBLIC_SIGNAL_CHANNEL_ID = 1354557176164782311  # Public signals channel
+TICKET_CATEGORY_ID = 1354558070004388081        # Ticket category
 
 @bot.event
 async def on_ready():
@@ -48,5 +50,13 @@ async def ticket(ctx, *, reason="No reason provided"):
         f"**Reason:** {reason}"
     )
 
-# Run the bot (Token is taken from environment variables)
-bot.run(os.environ['TOKEN'])
+# Auto-restart logic
+async def main():
+    try:
+        await bot.start(os.environ['TOKEN'])
+    except KeyboardInterrupt:
+        await bot.close()
+
+# Start the bot
+if __name__ == "__main__":
+    asyncio.run(main())
